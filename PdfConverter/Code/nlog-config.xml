@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      autoReload="false"
+      throwExceptions="false"
+      internalLogLevel="Off">
+    <extensions>
+        <add assembly="NLog.Web.AspNetCore"/>
+    </extensions>
+
+    <!-- !!LogsFolderTag!! will be replaced programmatically. -->
+    <variable name="LogsFolder" value="!LogsFolderTag!"/>
+
+    <!-- If Linux will be used in the future, need to replace paths-->
+    <targets>
+	    <target name="logFile" enableArchiveFileCompression="true"
+	            xsi:type="File" fileName="${LogsFolder}/chiron-log.txt"
+	            layout="${longdate} ${uppercase:${level}} [${callsite}] ${message} ${exception}"
+	            maxArchiveFiles="600" archiveAboveSize="11000000" archiveNumbering="DateAndSequence" archiveEvery="Day" archiveFileName="${LogsFolder}/chiron-log.{#}.zip" archiveDateFormat="yyyy-MM-dd"/>
+
+        <!-- This will print logs to visual studio output window. -->
+        <target xsi:type="Debugger" name="debugger" layout="${longdate} ${uppercase:${level}} [${callsite}] ${message} ${exception}"/>
+        <target xsi:type="Console" name="console"  layout="${longdate} ${uppercase:${level}} [${callsite}] ${message} ${exception:format=ToString,StackTrace}"/>
+    </targets>
+    <rules>
+        <logger name="*" minlevel="Info" maxlevel="Fatal" writeTo="logFile" />
+        <logger name="*" minlevel="Debug" writeTo="debugger" />
+        <logger name="*" minlevel="Debug" writeTo="console" />
+    </rules>
+</nlog>
